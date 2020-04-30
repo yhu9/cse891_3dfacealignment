@@ -106,7 +106,7 @@ def viewLM(myimg,lm2d):
     cv2.imshow('img', (myimg).astype(np.uint8))
     cv2.waitKey(1)
 
-    return myimg
+    return cv2.cvtColor(myimg,cv2.COLOR_BGR2RGB)
 
 if __name__ == '__main__':
 

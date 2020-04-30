@@ -65,7 +65,7 @@ def train():
 
             # adjustment network applied onto the landmarks of 3dMM taking input image
             adjustment = torch.tanh(adjustmentnet(x).view(-1,68,2))
-            pred = adjustment * 112 + 112
+            pred = (alignedshape + adjustment) * 112 + 112
             gt = y * 112 + 112
 
             # weight update
@@ -79,7 +79,6 @@ def train():
             sample = sample*255
             util.viewLM(sample.astype(np.uint8),pred)
             #io.imsave(f"example_{i:04d}.png",sample)
-
 
             print(f"epoch/batch {epoch}/{i}  |   Loss: {loss:.4f}")
 

@@ -101,8 +101,8 @@ class W300Loader(Dataset):
 
 
         # adjust landmarks to centralized face
-        pts[:,0] = pts[:,0] - minw
-        pts[:,1] = pts[:,1] - minh
+        pts[:,0] = pts[:,0] - minx
+        pts[:,1] = pts[:,1] - miny
         h,w,d = canvas.shape
         newd,newh,neww = img.shape
         pts[:,0] = (pts[:,0] / w) * neww
@@ -169,6 +169,7 @@ class LFWLoader(Dataset):
         lm2d[:,0] = lm2d[:,0] - 112
         lm2d[:,1] = lm2d[:,1] - 112
         lm2d = lm2d / 112
+
 
         sample = {'image': img,'lm2d':lm2d}
         return sample

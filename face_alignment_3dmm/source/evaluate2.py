@@ -11,7 +11,7 @@ from skimage import io, transform
 import dataloader
 import util
 from model import densenet
-#from model import adjustmentnet
+from model import adjustmentnet
 
 # read the 3dmm eigenvectors
 face3dmm = dataloader.Face3DMM()
@@ -21,8 +21,8 @@ model = densenet
 model.load_state_dict(torch.load("model/chkpoint_000.pt"))
 model.cuda()
 
-#adjustmentnet.load_state_dict(torch.load("model/chkpoint_adj_000.pt"))
-#adjustmentnet.cuda()
+adjustmentnet.load_state_dict(torch.load("model/chkpoint_adj_000.pt"))
+adjustmentnet.cuda()
 
 loader = dataloader.W300Loader()
 #loader = dataloader.LFWLoader()
@@ -61,9 +61,8 @@ for i, batch in enumerate(loader):
     alignedshape = t.unsqueeze(1) + scaledshape[:,:,:2]
 
     # adjustment network applied onto the landmarks of 3dMM taking input image
-    # adjustment = torch.tanh(adjustmentnet(x).view(-1,68,2))
-
-    pred = alignedshape*112 + 112
+    adjustment = torch.tanh(adjustmentnet(x).view(-1,68,2))
+    pred = adjustment* 112 + 112
     gt = y * 112 + 112
 
     # weight update
@@ -83,7 +82,7 @@ for i, batch in enumerate(loader):
     print(i,NME)
     sample = x[0].cpu().permute(1,2,0).data.numpy()
     sample = (sample*255).astype(np.uint8)
-    util.viewLM(sample,pred)
+    sample = util.viewLM(sample,pred)
     io.imsave(f"example_{i:04d}.png",sample)
 
 
