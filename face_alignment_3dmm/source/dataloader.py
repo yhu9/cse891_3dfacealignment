@@ -107,8 +107,8 @@ class W300Loader(Dataset):
         newd,newh,neww = img.shape
         pts[:,0] = (pts[:,0] / w) * neww
         pts[:,1] = (pts[:,1] / h) * newh
-        pts[:,0] = pts[:,0] - (neww // 2)
-        pts[:,1] = pts[:,1] - (newh // 2)
+        pts[:,0] = pts[:,0] - 112
+        pts[:,1] = pts[:,1] - 112
         pts = pts / 112
         pts = self.transform_lm(pts)
 
@@ -166,8 +166,8 @@ class LFWLoader(Dataset):
         lm2d[0,:] = (lm2d[0,:]/w)*new_w
         lm2d[1,:] = (lm2d[1,:]/h)*new_h
         lm2d = lm2d.T
-        lm2d[:,0] = lm2d[:,0] - (new_w // 2)
-        lm2d[:,1] = lm2d[:,1] - (new_h // 2)
+        lm2d[:,0] = lm2d[:,0] - 112
+        lm2d[:,1] = lm2d[:,1] - 112
         lm2d = lm2d / 112
 
         sample = {'image': img,'lm2d':lm2d}

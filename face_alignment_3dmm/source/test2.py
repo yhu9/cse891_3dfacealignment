@@ -18,20 +18,20 @@ face3dmm = dataloader.Face3DMM()
 model = densenet
 model.load_state_dict(torch.load("model/chkpoint_000.pt"))
 model.cuda()
-model.eval()
 
 # read the adjustment network checkpoint
 adjustmentnet.load_state_dict(torch.load("model/chkpoint_adj_000.pt"))
 adjustmentnet.cuda()
-adjustmentnet.eval()
 
 # read the img file from system argument
 filenamein = sys.argv[1]
-img = io.imread(filenamein)
+original = io.imread(filenamein)
+new_h,new_w,d = original.shape
 
 # reshape image to 224x224
-img = cv2.resize(img,(224,224),interpolation=cv2.INTER_AREA)
-img = torch.Tensor(img).float().cuda()
+batchsize=1
+resized = cv2.resize(original,(224,224),interpolation=cv2.INTER_AREA)
+img = torch.Tensor(resized).float().cuda()
 img = img.permute(2,0,1).unsqueeze(0)
 
 # apply model on input
@@ -60,6 +60,13 @@ alignedshape = t.unsqueeze(1) + scaledshape[:,:,:2]
 adjustment = torch.tanh(adjustmentnet(img).view(-1,68,2))
 output = alignedshape + adjustment
 
+pred = output.cpu().data.numpy()
+pred = pred*112 + 112
+pred = pred[0]
+
+pred[:,0] = (pred[:,0]/224)*new_w
+pred[:,1] = (pred[:,1]/224)*new_h
+util.viewLM(original,pred)
 
 
 

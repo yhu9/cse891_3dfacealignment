@@ -1,10 +1,12 @@
 
 import itertools
 import argparse
+import os
 
 import torch
 import torch.optim
 import numpy as np
+from skimage import io, transform
 
 from model import densenet
 from model import adjustmentnet
@@ -63,20 +65,21 @@ def train():
 
             # adjustment network applied onto the landmarks of 3dMM taking input image
             adjustment = torch.tanh(adjustmentnet(x).view(-1,68,2))
+            pred = adjustment * 112 + 112
+            gt = y * 112 + 112
 
             # weight update
-            loss = torch.mean(torch.abs(y - (alignedshape+adjustment)))
+            loss = torch.mean(torch.norm(gt - pred,p=2,dim=2))
             loss.backward()
             optimizer.step()
 
-            '''
-            pred = alignedshape + adjustment
+            gt = gt[0].cpu().data.numpy()
             pred = pred[0].cpu().data.numpy()
-            pred = pred * 112 + 112
             sample = x[0].cpu().permute(1,2,0).data.numpy()
             sample = sample*255
             util.viewLM(sample.astype(np.uint8),pred)
-            '''
+            #io.imsave(f"example_{i:04d}.png",sample)
+
 
             print(f"epoch/batch {epoch}/{i}  |   Loss: {loss:.4f}")
 
